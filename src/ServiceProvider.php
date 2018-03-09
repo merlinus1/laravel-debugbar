@@ -67,7 +67,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         $enabled = $this->app['config']->get('debugbar.enabled');
 
         if (is_null($enabled)) {
-            $enabled = $this->checkAppDebug();
+            $enabled = $this->checkAppDebug() || $this->checkDebugIps();
         }
 
         if (! $enabled) {
@@ -96,7 +96,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
                 'as' => 'debugbar.assets.css',
             ]);
 
-            $router->get('assets/javascript', [
+            $router->get('assets/javascript.js', [
                 'uses' => 'AssetController@js',
                 'as' => 'debugbar.assets.js',
             ]);
@@ -165,6 +165,17 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
     protected function checkAppDebug()
     {
         return $this->app['config']->get('app.debug');
+    }
+    
+    /**
+     * Check allowed debug ips
+     * @return bool
+     */
+    protected function checkDebugIps()
+    {
+        $ips = explode(',', $this->app['config']->get('debugbar.ips'));
+
+        return in_array(request()->ip(), $ips);
     }
 
     /**
