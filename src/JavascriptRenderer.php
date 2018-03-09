@@ -20,6 +20,8 @@ class JavascriptRenderer extends BaseJavascriptRenderer
         $this->cssFiles['laravel'] = __DIR__ . '/Resources/laravel-debugbar.css';
         $this->cssVendors['fontawesome'] = __DIR__ . '/Resources/vendor/font-awesome/style.css';
         $this->jsFiles['laravel-sql'] = __DIR__ . '/Resources/sqlqueries/widget.js';
+        
+        $this->setUseRequireJs(true);
     }
 
     /**
@@ -50,7 +52,7 @@ class JavascriptRenderer extends BaseJavascriptRenderer
         $jsRoute  = preg_replace('/\Ahttps?:/', '', $jsRoute);
 
         $html  = "<link rel='stylesheet' type='text/css' property='stylesheet' href='{$cssRoute}'>";
-        $html .= "<script type='text/javascript' src='{$jsRoute}'></script>";
+        //$html .= "<script type='text/javascript' src='{$jsRoute}'></script>";
 
         return $html;
     }
@@ -97,6 +99,10 @@ class JavascriptRenderer extends BaseJavascriptRenderer
         $content = '';
         foreach ($files as $file) {
             $content .= file_get_contents($file) . "\n";
+        }
+        
+        if ($type == 'js' && $this->useRequireJs()) {
+            $content = "define('debugbar', ['jquery'], function($){\r\n" . $content . "\r\n return PhpDebugBar; \r\n});";
         }
 
         return $content;
